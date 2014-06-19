@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "zs-linter": "git+ssh://git@git.zipscene.com:zsapicore/zs-linter.git",
-    "zs-error": "git+ssh://git@git.zipscene.com:zsapicore/zs-error.git#v0.0.4",
+    "zs-error": "git+ssh://git@git.zipscene.com:zsapicore/zs-error.git#v0.0.5",
     "objtools": "git+ssh://git@git.zipscene.com:zsapilibs/objtools.git#v0.0.2",
     "common-query": "git+ssh://git@git.zipscene.com:zsapilibs/common-query.git#v0.0.2"
   },
