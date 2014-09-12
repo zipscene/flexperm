@@ -1,6 +1,6 @@
 {
   "name": "zs-permission",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "private": true,
   "description": "Permissions checking and handling for zsapi.",
   "main": "./lib/index.js",
@@ -13,9 +13,9 @@
   },
   "dependencies": {
     "MD5": "^1.2.1",
-    "common-query": "git+ssh://git@git.zipscene.com:zsapilibs/common-query.git#v0.0.15",
+    "common-query": "git+ssh://git@git.zipscene.com:zsapilibs/common-query.git#v0.0.17",
     "objtools": "git+ssh://git@git.zipscene.com:zsapilibs/objtools.git#v0.0.10",
-    "zs-error": "git+ssh://git@git.zipscene.com:zsapicore/zs-error.git#v0.0.7",
+    "zs-error": "git+ssh://git@git.zipscene.com:zsapicore/zs-error.git#v0.0.8",
     "zs-linter": "git+ssh://git@git.zipscene.com:zsapicore/zs-linter.git"
   },
   "devDependencies": {}
