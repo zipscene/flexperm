@@ -18,3 +18,5 @@ datakeys
 *.swp
 zs-api.sublime-project
 zs-api.sublime-workspace
+
+bower_components
