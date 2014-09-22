@@ -1,6 +1,6 @@
 {
   "name": "zs-permission",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "private": true,
   "description": "Permissions checking and handling for zsapi.",
   "main": "./lib/index.js",
