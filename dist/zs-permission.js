@@ -1,8 +1,322 @@
-var Query = require('common-query').Query;
-var objtools = require('objtools');
-var Grant = require('./grant');
-var md5 = require('blueimp-md5');
-var ZSError = require('zs-error');
+/** zs-permission.js - v0.0.20 - Mon, 22 Sep 2014 18:02:29 GMT */
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),(f.ZS||(f.ZS={})).Permission=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+var ZSError = (typeof window !== "undefined" ? window.ZS.Error : typeof global !== "undefined" ? global.ZS.Error : null);
+var objtools = (typeof window !== "undefined" ? window.ZS.objtools : typeof global !== "undefined" ? global.ZS.objtools : null);
+
+/**
+ * Grant constructor.
+ *
+ * @param grantObj object The grant object data
+ * @param targetType string Optional target type used to generate the grant
+ * @param target object Optional target used to generate the grant
+ */
+var Grant = function(grantObj, targetType, target) {
+	this.grant = grantObj;
+	this._targetType = targetType;
+	this._target = target;
+};
+
+module.exports = Grant;
+
+Grant.prototype.getTargetType = function() {
+	return this._targetType;
+};
+
+Grant.prototype.getTarget = function() {
+	return this._target;
+};
+
+Grant.prototype.createSubgrantFromMask = function(mask) {
+	if(typeof mask == 'string') {
+		mask = this.getMask(mask);
+	}
+	return new Grant(mask, this._targetType, this._target);
+};
+
+Grant.prototype.createSubgrantFromMasks = function(masks) {
+	var maskObjs = [];
+	for(var i = 0; i < masks.length; i++) {
+		if(typeof masks[i] == 'string') {
+			maskObjs.push(this.getMask(masks[i]));
+		} else {
+			maskObjs.push(masks[i]);
+		}
+	}
+	var mask = combineGrants(maskObjs);
+	return new Grant(mask, this._targetType, this._target);
+};
+
+/**
+ * Returns the data associated with a Grant object.
+ *
+ * @return object The data.
+ */
+Grant.prototype.asObject = function() {
+	return this.grant;
+};
+
+/**
+ * Checks whether the grant contains the given field.
+ *
+ * @param k mixed Can be a string naming a dot-separated path to check for, or an array of strings,
+ * or an object mapping dot-separated paths to boolean true.
+ * @return boolean Whether or not the given field is contained.
+ */
+Grant.prototype.has = function(k, prefix) {
+	if(!prefix) prefix = '';
+	var self = this;
+	if(this.grant === true) return true;
+	if(typeof this.grant != 'object') return false;
+
+	function checkPath(path) {
+		return objtools.checkMaskPath(self.grant, path);
+	}
+
+	if(typeof k == 'string') {
+		return checkPath(prefix + k);
+	} else if(Array.isArray(k)) {
+		for(var i = 0; i < k.length; i++) {
+			if(!checkPath(prefix + k[i])) return false;
+		}
+		return true;
+	} else if(typeof k == 'object' && k) {
+		for(var key in k) {
+			if(k[key] && !checkPath(prefix + k[key])) return false;
+		}
+		return true;
+	} else {
+		return false;
+	}
+};
+
+// Alias has to can
+Grant.prototype.can = Grant.prototype.has;
+
+// Like has(), but returns null on success and an instance of ZSError on failure
+// Prefer to use this instead of has() if possible so errors are returned in a consistent format
+Grant.prototype.check = function(k, prefix) {
+	if(!prefix) prefix = '';
+	if(typeof k == 'string') {
+		if(!this.has(k, prefix)) {
+			if(this._targetType) {
+				return new ZSError(ZSError.ACCESS_DENIED, 'Access denied trying to ' + prefix + k + ' a target of type ' + this._targetType, { grantKey: prefix + k, targetType: this._targetType, target: this._target });
+			} else {
+				return new ZSError(ZSError.ACCESS_DENIED, 'Access denied trying to ' + prefix + k);
+			}
+		}
+	} else if(Array.isArray(k)) {
+		for(var i = 0; i < k.length; i++) {
+			var e = this.check(k[i], prefix);
+			if(e) return e;
+		}
+	} else if(typeof k == 'object' && k) {
+		for(var key in k) {
+			var e2 = this.check(key, prefix);
+			if(e2) return e2;
+		}
+	} else {
+		return new ZSError(ZSError.INTERNAL_ERROR, 'Supplied invalid key to permission checking function', { key: k });
+	}
+	return null;
+};
+
+/**
+ * Checks an object against a mask that's a subcomponent of this grant.  If any field is in the object
+ * that is not matched by the grant, this returns a ZSError.  Otherwisee, it returns null.
+ * The mask argument can either be a mask object or a string path to a mask in this grant.
+ */
+Grant.prototype.checkMask = function(mask, obj) {
+	var maskPath = null;
+	if(typeof mask == 'string') {
+		maskPath = mask;
+		mask = this.getMask(maskPath);
+	}
+
+	if(mask === true) return null;
+	if(!mask) return new ZSError(ZSError.ACCESS_DENIED, 'Access denied in ' + (maskPath || 'mask') + ' for objects of type ' + this._targetType, { grantKey: maskPath, targetType: this._targetType, target: this._target });
+	if(!obj || typeof obj != 'object') return new ZSError(ZSError.INTERNAL_ERROR, 'Tried to do permissions match against non-object');
+
+	var maskedOutFields = objtools.getMaskedOutFields(obj, mask);
+	if(maskedOutFields.length) return new ZSError(ZSError.ACCESS_DENIED, 'Access denied in ' + (maskPath || 'mask') + ' for objects of type ' + this._targetType + ' to access field ' + maskedOutFields[0], { grantKey: maskPath, targetType: this._targetType, target: this._target });
+	return null;
+};
+
+/**
+ * Returns a sub-part of a grant.  May return boolean true (if all permissions granted) or
+ * boolean false (if no permission is granted) in the sub-part.
+ *
+ * @param k string A dot-separated path in the grant data
+ * @return mixed The contents of the grant portion, or true/false
+ */
+Grant.prototype.get = function(k) {
+	function gget(keyParts, grantObj) {
+		if(grantObj === true) return true;
+		if(!keyParts.length) return grantObj;
+		if(typeof grantObj == 'object' && grantObj) {
+			return gget(keyParts.slice(1), grantObj[keyParts[0]]);
+		}
+		return false;
+	}
+	return gget(k.split('.'), this.grant);
+};
+
+/**
+ * Returns the maximum of a numeric value in a grant.
+ *
+ * @param k string A path in the grant
+ * @return number The max, or null
+ */
+Grant.prototype.max = function(k) {
+	var val = this.get(k);
+	if(val === true) return Infinity;
+	if(!val || typeof val != 'object' || !val.grantNumber || typeof val.max != 'number') return null;
+	return val.max;
+};
+
+/**
+ * Returns the minimum of a numeric value in a grant.
+ *
+ * @param k string A path in the grant
+ * @return number The min, or null
+ */
+Grant.prototype.min = function(k) {
+	var val = this.get(k);
+	if(val === true) return -Infinity;
+	if(!val || typeof val != 'object' || !val.grantNumber || typeof val.min != 'number') return null;
+	return val.min;
+};
+
+/**
+ * Returns a mask/whitelist at the given path in the grant.
+ *
+ * @param k string A path in the grant
+ * @return mixed The mask at that path in the grant (can be boolean true or false as well)
+ */
+Grant.prototype.getMask = function(k) {
+	var mask = this.get(k);
+	if(mask !== true && typeof mask != 'object') return false;
+	return mask;
+};
+
+/**
+ * Combines this grant with the given other grant.  The result overwrites this grant's data.
+ */
+Grant.prototype.combine = function(otherGrant) {
+	this.grant = combineGrants(this.grant, otherGrant.grant);
+};
+
+
+/**
+ * Combines multiple grants together.
+ *
+ * @param grant1...n mixed Grant object contents to combine (not Grant objects, the actual data)
+ * @return object The combined grant
+ */
+// This code is copied and modified from objtools addMasks() function
+function combineGrants() {
+	var resultMask = false;
+
+	// Adds a single mask (fromMask) into the resultMask mask in-place.  toMask should be an object.
+	// If the resulting mask is a boolean true, this function returns true.  Otherwise, it returns toMask.
+	function addMask(resultMask, newMask) {
+		var key;
+
+		if(resultMask === true) return true;
+		if(newMask === true) {
+			resultMask = true;
+			return resultMask;
+		}
+		if(objtools.isScalar(newMask)) return resultMask;
+		if(objtools.isScalar(resultMask)) {
+			resultMask = objtools.deepCopy(newMask);
+			return resultMask;
+		}
+
+		if(Array.isArray(resultMask)) {
+			resultMask = { _: resultMask[0] || false };
+		}
+		if(Array.isArray(newMask)) {
+			newMask = { _: newMask[0] || false };
+		}
+
+		// Handle the case of grant numbers
+		if(resultMask.grantNumber && newMask.grantNumber) {
+			resultMask.min = Math.min(resultMask.min, newMask.min);
+			resultMask.max = Math.max(resultMask.max, newMask.max);
+			return resultMask;
+		} else if(resultMask.grantNumber || newMask.grantNumber) {
+			return false;	// Mismatched types ... can't really handle it better
+		}
+
+		// If there are keys that exist in result but not in the newMask, and the result mask has a _ key (wildcard), combine
+		// the wildcard mask with the new mask, because in the existing result mask, that key has the wildcard permissions
+		if(newMask._ !== undefined) {
+			for(key in resultMask) {
+				if(key === '_') continue;
+				if(newMask[key] === undefined) {
+					resultMask[key] = addMask(resultMask[key], newMask._);
+				}
+			}
+		}
+
+		// same here ... also, copy over or merge fields
+		for(key in newMask) {
+			if(key === '_') continue;
+			if(resultMask[key] !== undefined) {
+				resultMask[key] = addMask(resultMask[key], newMask[key]);
+			} else if(resultMask._ !== undefined) {
+				resultMask[key] = addMask(objtools.deepCopy(newMask[key]), resultMask._);
+			} else {
+				resultMask[key] = objtools.deepCopy(newMask[key]);
+			}
+		}
+		// fill in the _ key that we skipped earlier
+		if(newMask._ !== undefined) {
+			if(resultMask._ !== undefined) resultMask._ = addMask(resultMask._, newMask._);
+			else resultMask._ = objtools.deepCopy(newMask._);
+		}
+
+		return resultMask || false;
+	}
+
+	for(var argIdx = 0; argIdx < arguments.length; argIdx++) {
+		resultMask = addMask(resultMask, arguments[argIdx]);
+		if(resultMask === true) return true;
+	}
+	return resultMask || false;
+}
+
+Grant.combineGrants = combineGrants;
+Grant.combineMasks = combineGrants;
+
+
+// Internal function that processes numeric grant entries into min/max objects
+function grantNumbersToObjects(grantObj) {
+	if(grantObj && typeof grantObj == 'object' && !grantObj.grantNumber) {
+		var newObj = {};
+		Object.keys(grantObj).forEach(function(k) {
+			newObj[k] = grantNumbersToObjects(grantObj[k]);
+		});
+		return newObj;
+	} else if(typeof grantObj == 'number') {
+		return {
+			grantNumber: true,
+			min: grantObj,
+			max: grantObj
+		};
+	} else {
+		return grantObj;
+	}
+}
+
+Grant.grantNumbersToObjects = grantNumbersToObjects;
+
+},{"objtools":"objtools","zs-error":"zs-error"}],2:[function(_dereq_,module,exports){
+var commonQuery = (typeof window !== "undefined" ? window.ZS.commonQuery : typeof global !== "undefined" ? global.ZS.commonQuery : null);
+var objtools = (typeof window !== "undefined" ? window.ZS.objtools : typeof global !== "undefined" ? global.ZS.objtools : null);
+var Grant = _dereq_('./grant');
+var md5 = (typeof window !== "undefined" ? window.md5 : typeof global !== "undefined" ? global.md5 : null);
+var ZSError = (typeof window !== "undefined" ? window.ZS.Error : typeof global !== "undefined" ? global.ZS.Error : null);
 
 function PermissionSet(permArray, permissionVars, _raw) {
 	if(_raw) return;
@@ -96,10 +410,8 @@ PermissionSet.prototype.createFilterByMask = function(targetType, grantPath, mas
 // To check for a permission on the grant other than 'read' and 'query' (for example, 'count'), supply queryTypeGrantName (can also be an array, which is OR'd together)
 // Returns null on success or ZSError on error
 PermissionSet.prototype.checkExecuteQuery = function(targetType, query, queryOptions, queryTypeGrantName) {
-	var cQuery = new Query(query);
-
 	// get the query grant for this query
-	var queryGrant = this.getTargetGrant(targetType, cQuery.getExactMatches());
+	var queryGrant = this.getTargetGrant(targetType, commonQuery.queryToObject(query));
 
 	// Make sure the user has read or query permission for the query
 	var accessError;
@@ -116,7 +428,7 @@ PermissionSet.prototype.checkExecuteQuery = function(targetType, query, queryOpt
 	if(accessError) return accessError;
 
 	// Make sure the user can read all fields used in the query
-	accessError = queryGrant.check(cQuery.getFields(), 'readMask.');
+	accessError = queryGrant.check(commonQuery.getQueriedFields(targetType, query), 'readMask.');
 	if(accessError) return accessError;
 
 	// Make sure the user can read all fields requested to be returned (not strictly necessary, but will generate helpful errors early)
@@ -176,7 +488,7 @@ function getPermissionTreeMatchingGrants(permTree, targetObject) {
 		var i, j;
 		for(i = 0; i < tree.perms.length; i++) {
 			var perm = tree.perms[i];
-			if(!perm.target || new Query(perm.target).matches(targetObject)) {
+			if(!perm.target || commonQuery.queryMatches('Permission', perm.target, targetObject)) {
 				grants.push(tree.perms[i].grant);
 			}
 		}
@@ -213,7 +525,7 @@ function getPermissionTreeQueryFields(permTree, targetType, fieldSet) {
 		if(tree.perms) {
 			for(i = 0; i < tree.perms.length; i++) {
 				if(tree.perms[i].target) {
-					queryFields = new Query(tree.perms[i].target).getFields();
+					queryFields = commonQuery.getQueriedFields(targetType || null, tree.perms[i].target);
 					for(j = 0; j < queryFields.length; j++) {
 						fieldSet[queryFields[j]] = true;
 					}
@@ -403,9 +715,7 @@ function buildPermissionTree(permArray, permissionVars) {
 					} catch(ex) {}
 				}
 				if(target && typeof target == 'object') {
-					var cQuery = new Query(target).substituteVars(permissionVars || {}, true);
-					cQuery.substituteVars(target, permissionVars || {}, true);
-					target = cQuery.toObject();
+					commonQuery.substituteVars(target, permissionVars || {}, true);
 				}
 				var grant = Grant.grantNumbersToObjects(perm.grant);
 				if(baseTarget) {
@@ -463,3 +773,9 @@ function combineTargetQueries() {
 	}
 	return resultQuery;
 }
+
+},{"./grant":1,"blueimp-md5":"blueimp-md5","common-query":"common-query","objtools":"objtools","zs-error":"zs-error"}],"zs-permission":[function(_dereq_,module,exports){
+module.exports = _dereq_('./permission-set');
+
+},{"./permission-set":2}]},{},[])("zs-permission")
+});
