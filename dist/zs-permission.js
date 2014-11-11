@@ -1,4 +1,4 @@
-/** zs-permission.js - v0.0.21 - Tue, 11 Nov 2014 21:00:13 GMT */
+/** zs-permission.js - v0.0.22 - Tue, 11 Nov 2014 22:04:57 GMT */
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var o;"undefined"!=typeof window?o=window:"undefined"!=typeof global?o=global:"undefined"!=typeof self&&(o=self),(o.ZSModule||(o.ZSModule={})).ZSPermission=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 var ZSError = (typeof window !== "undefined" ? window.ZSModule.ZSError : typeof global !== "undefined" ? global.ZSModule.ZSError : null);
 var objtools = (typeof window !== "undefined" ? window.ZSModule.objtools : typeof global !== "undefined" ? global.ZSModule.objtools : null);
@@ -312,7 +312,7 @@ function grantNumbersToObjects(grantObj) {
 Grant.grantNumbersToObjects = grantNumbersToObjects;
 
 },{"objtools":"objtools","zs-error":"zs-error"}],2:[function(_dereq_,module,exports){
-var commonQuery = (typeof window !== "undefined" ? window.ZSModule.commonQuery : typeof global !== "undefined" ? global.ZSModule.commonQuery : null);
+var Query = (typeof window !== "undefined" ? window.ZSModule.commonQuery : typeof global !== "undefined" ? global.ZSModule.commonQuery : null).Query;
 var objtools = (typeof window !== "undefined" ? window.ZSModule.objtools : typeof global !== "undefined" ? global.ZSModule.objtools : null);
 var Grant = _dereq_('./grant');
 var md5 = (typeof window !== "undefined" ? window.md5 : typeof global !== "undefined" ? global.md5 : null);
@@ -410,8 +410,10 @@ PermissionSet.prototype.createFilterByMask = function(targetType, grantPath, mas
 // To check for a permission on the grant other than 'read' and 'query' (for example, 'count'), supply queryTypeGrantName (can also be an array, which is OR'd together)
 // Returns null on success or ZSError on error
 PermissionSet.prototype.checkExecuteQuery = function(targetType, query, queryOptions, queryTypeGrantName) {
+	var cQuery = new Query(query);
+
 	// get the query grant for this query
-	var queryGrant = this.getTargetGrant(targetType, commonQuery.queryToObject(query));
+	var queryGrant = this.getTargetGrant(targetType, cQuery.getExactMatches());
 
 	// Make sure the user has read or query permission for the query
 	var accessError;
@@ -428,7 +430,7 @@ PermissionSet.prototype.checkExecuteQuery = function(targetType, query, queryOpt
 	if(accessError) return accessError;
 
 	// Make sure the user can read all fields used in the query
-	accessError = queryGrant.check(commonQuery.getQueriedFields(targetType, query), 'readMask.');
+	accessError = queryGrant.check(cQuery.getFields(), 'readMask.');
 	if(accessError) return accessError;
 
 	// Make sure the user can read all fields requested to be returned (not strictly necessary, but will generate helpful errors early)
@@ -488,7 +490,7 @@ function getPermissionTreeMatchingGrants(permTree, targetObject) {
 		var i, j;
 		for(i = 0; i < tree.perms.length; i++) {
 			var perm = tree.perms[i];
-			if(!perm.target || commonQuery.queryMatches('Permission', perm.target, targetObject)) {
+			if(!perm.target || new Query(perm.target).matches(targetObject)) {
 				grants.push(tree.perms[i].grant);
 			}
 		}
@@ -525,7 +527,7 @@ function getPermissionTreeQueryFields(permTree, targetType, fieldSet) {
 		if(tree.perms) {
 			for(i = 0; i < tree.perms.length; i++) {
 				if(tree.perms[i].target) {
-					queryFields = commonQuery.getQueriedFields(targetType || null, tree.perms[i].target);
+					queryFields = new Query(tree.perms[i].target).getFields();
 					for(j = 0; j < queryFields.length; j++) {
 						fieldSet[queryFields[j]] = true;
 					}
@@ -715,7 +717,9 @@ function buildPermissionTree(permArray, permissionVars) {
 					} catch(ex) {}
 				}
 				if(target && typeof target == 'object') {
-					commonQuery.substituteVars(target, permissionVars || {}, true);
+					var cQuery = new Query(target).substituteVars(permissionVars || {}, true);
+					cQuery.substituteVars(target, permissionVars || {}, true);
+					target = cQuery.toObject();
 				}
 				var grant = Grant.grantNumbersToObjects(perm.grant);
 				if(baseTarget) {
