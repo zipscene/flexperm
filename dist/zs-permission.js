@@ -1,7 +1,7 @@
-/** zs-permission.js - v0.0.20 - Mon, 22 Sep 2014 18:02:29 GMT */
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),(f.ZS||(f.ZS={})).Permission=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-var ZSError = (typeof window !== "undefined" ? window.ZS.Error : typeof global !== "undefined" ? global.ZS.Error : null);
-var objtools = (typeof window !== "undefined" ? window.ZS.objtools : typeof global !== "undefined" ? global.ZS.objtools : null);
+/** zs-permission.js - v0.0.21 - Tue, 11 Nov 2014 21:00:13 GMT */
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var o;"undefined"!=typeof window?o=window:"undefined"!=typeof global?o=global:"undefined"!=typeof self&&(o=self),(o.ZSModule||(o.ZSModule={})).ZSPermission=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+var ZSError = (typeof window !== "undefined" ? window.ZSModule.ZSError : typeof global !== "undefined" ? global.ZSModule.ZSError : null);
+var objtools = (typeof window !== "undefined" ? window.ZSModule.objtools : typeof global !== "undefined" ? global.ZSModule.objtools : null);
 
 /**
  * Grant constructor.
@@ -312,11 +312,11 @@ function grantNumbersToObjects(grantObj) {
 Grant.grantNumbersToObjects = grantNumbersToObjects;
 
 },{"objtools":"objtools","zs-error":"zs-error"}],2:[function(_dereq_,module,exports){
-var commonQuery = (typeof window !== "undefined" ? window.ZS.commonQuery : typeof global !== "undefined" ? global.ZS.commonQuery : null);
-var objtools = (typeof window !== "undefined" ? window.ZS.objtools : typeof global !== "undefined" ? global.ZS.objtools : null);
+var commonQuery = (typeof window !== "undefined" ? window.ZSModule.commonQuery : typeof global !== "undefined" ? global.ZSModule.commonQuery : null);
+var objtools = (typeof window !== "undefined" ? window.ZSModule.objtools : typeof global !== "undefined" ? global.ZSModule.objtools : null);
 var Grant = _dereq_('./grant');
 var md5 = (typeof window !== "undefined" ? window.md5 : typeof global !== "undefined" ? global.md5 : null);
-var ZSError = (typeof window !== "undefined" ? window.ZS.Error : typeof global !== "undefined" ? global.ZS.Error : null);
+var ZSError = (typeof window !== "undefined" ? window.ZSModule.ZSError : typeof global !== "undefined" ? global.ZSModule.ZSError : null);
 
 function PermissionSet(permArray, permissionVars, _raw) {
 	if(_raw) return;
