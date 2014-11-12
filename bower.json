@@ -19,5 +19,9 @@
     "aliases": {
       "blueimp-md5": "md5"
     }
+  },
+  "resolutions": {
+    "zs-error": "v0.0.13",
+    "objtools": "v0.0.16"
   }
 }

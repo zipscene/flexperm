@@ -1,4 +1,4 @@
-/** zs-permission.js - v0.0.22 - Tue, 11 Nov 2014 22:04:57 GMT */
+/** zs-permission.js - v0.0.22 - Wed, 12 Nov 2014 16:52:09 GMT */
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var o;"undefined"!=typeof window?o=window:"undefined"!=typeof global?o=global:"undefined"!=typeof self&&(o=self),(o.ZSModule||(o.ZSModule={})).ZSPermission=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 var ZSError = (typeof window !== "undefined" ? window.ZSModule.ZSError : typeof global !== "undefined" ? global.ZSModule.ZSError : null);
 var objtools = (typeof window !== "undefined" ? window.ZSModule.objtools : typeof global !== "undefined" ? global.ZSModule.objtools : null);
@@ -717,7 +717,7 @@ function buildPermissionTree(permArray, permissionVars) {
 					} catch(ex) {}
 				}
 				if(target && typeof target == 'object') {
-					var cQuery = new Query(target).substituteVars(permissionVars || {}, true);
+					var cQuery = new Query(target);
 					cQuery.substituteVars(target, permissionVars || {}, true);
 					target = cQuery.toObject();
 				}
