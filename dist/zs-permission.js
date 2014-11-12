@@ -1,7 +1,7 @@
-/** zs-permission.js - v0.0.22 - Tue, 11 Nov 2014 22:04:57 GMT */
+/** zs-permission.js - v0.0.22 - Wed, 12 Nov 2014 16:50:19 GMT */
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var o;"undefined"!=typeof window?o=window:"undefined"!=typeof global?o=global:"undefined"!=typeof self&&(o=self),(o.ZSModule||(o.ZSModule={})).ZSPermission=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-var ZSError = (typeof window !== "undefined" ? window.ZSModule.ZSError : typeof global !== "undefined" ? global.ZSModule.ZSError : null);
-var objtools = (typeof window !== "undefined" ? window.ZSModule.objtools : typeof global !== "undefined" ? global.ZSModule.objtools : null);
+var ZSError = (typeof window !== "undefined" ? window.ZSModule.core.Error : typeof global !== "undefined" ? global.ZSModule.core.Error : null);
+var objtools = (typeof window !== "undefined" ? window.ZSModule.libs.objtools : typeof global !== "undefined" ? global.ZSModule.libs.objtools : null);
 
 /**
  * Grant constructor.
@@ -312,11 +312,11 @@ function grantNumbersToObjects(grantObj) {
 Grant.grantNumbersToObjects = grantNumbersToObjects;
 
 },{"objtools":"objtools","zs-error":"zs-error"}],2:[function(_dereq_,module,exports){
-var Query = (typeof window !== "undefined" ? window.ZSModule.commonQuery : typeof global !== "undefined" ? global.ZSModule.commonQuery : null).Query;
-var objtools = (typeof window !== "undefined" ? window.ZSModule.objtools : typeof global !== "undefined" ? global.ZSModule.objtools : null);
+var Query = (typeof window !== "undefined" ? window.ZSModule.libs.commonQuery : typeof global !== "undefined" ? global.ZSModule.libs.commonQuery : null).Query;
+var objtools = (typeof window !== "undefined" ? window.ZSModule.libs.objtools : typeof global !== "undefined" ? global.ZSModule.libs.objtools : null);
 var Grant = _dereq_('./grant');
 var md5 = (typeof window !== "undefined" ? window.md5 : typeof global !== "undefined" ? global.md5 : null);
-var ZSError = (typeof window !== "undefined" ? window.ZSModule.ZSError : typeof global !== "undefined" ? global.ZSModule.ZSError : null);
+var ZSError = (typeof window !== "undefined" ? window.ZSModule.core.Error : typeof global !== "undefined" ? global.ZSModule.core.Error : null);
 
 function PermissionSet(permArray, permissionVars, _raw) {
 	if(_raw) return;
@@ -717,7 +717,7 @@ function buildPermissionTree(permArray, permissionVars) {
 					} catch(ex) {}
 				}
 				if(target && typeof target == 'object') {
-					var cQuery = new Query(target).substituteVars(permissionVars || {}, true);
+					var cQuery = new Query(target);
 					cQuery.substituteVars(target, permissionVars || {}, true);
 					target = cQuery.toObject();
 				}
