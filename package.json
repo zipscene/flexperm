@@ -1,25 +1,41 @@
 {
   "name": "zs-permission",
-  "version": "0.0.22",
-  "private": true,
-  "description": "Permissions checking and handling for zsapi.",
-  "main": "./lib/index.js",
+  "version": "0.0.1",
+  "description": "Permissions checking and handling for zsapi",
+  "main": "./dist/lib/index.js",
   "repository": {
     "type": "git",
     "url": "git@git.zipscene.com:zsapilibs/zs-permission.git"
   },
   "scripts": {
-    "lint": "node node_modules/zs-linter/scripts/zslint",
-    "bowerify": "node node_modules/bowerify/bin/cmd.js"
+    "lint": "node ./node_modules/.bin/eslint . || exit 0",
+    "docs": "node ./node_modules/.bin/yuidoc .",
+    "test": "npm run-script build && node ./node_modules/.bin/mocha ./dist/test -R spec",
+    "build": "rm -rf dist && ./node_modules/.bin/broccoli build dist && rm -rf tmp",
+    "prepublish": "npm run-script build && npm run-script docs"
   },
   "dependencies": {
-    "blueimp-md5": "^1.1.0",
-    "common-query": "git+ssh://git@git.zipscene.com:zsapilibs/common-query.git#v0.0.23",
-    "objtools": "git+ssh://git@git.zipscene.com:zsapilibs/objtools.git#v0.0.16",
-    "zs-error": "git+ssh://git@git.zipscene.com:zsapicore/zs-error.git#v0.0.13"
+    "babel-runtime": "5.8.20",
+    "lodash": "^3.10.1",
+    "xerror": "^1.0.0",
+    "zs-common-query": "^1.3.0",
+    "zs-objtools": "^1.1.1"
   },
   "devDependencies": {
-    "zs-linter": "git+ssh://git@git.zipscene.com:zsapicore/zs-linter.git",
-    "bowerify": "git+ssh://git@git.zipscene.com:zsapilibs/bowerify.git"
+    "broccoli": "^0.16.7",
+    "broccoli-babel-transpiler": "^5.4.3",
+    "broccoli-cli": "^1.0.0",
+    "broccoli-merge-trees": "^0.2.3",
+    "broccoli-static-compiler": "^0.2.1",
+    "broccoli-wrap": "0.0.2",
+    "chai": "^3.2.0",
+    "es6-promise": "^3.0.2",
+    "eslint": "^1.2.1",
+    "mocha": "^2.2.5",
+    "source-map-support": "^0.3.2",
+    "yuidocjs": "^0.9.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.zipscene.com/"
   }
 }
