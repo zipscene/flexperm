@@ -1,5 +1,5 @@
 let expect = require('chai').expect;
-var PermissionSet = require('../lib/index');
+let PermissionSet = require('../lib/index');
 
 
 
