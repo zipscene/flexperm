@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "babel-runtime": "5.8.20",
+    "blueimp-md5": "^1.1.1",
     "lodash": "^3.10.1",
     "xerror": "^1.0.0",
     "zs-common-query": "^1.3.0",

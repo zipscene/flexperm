@@ -1,12 +1,14 @@
 let expect = require('chai').expect;
+var PermissionSet = require('../lib/index');
 
-describe('Example', function() {
 
-	it('should fail because this is just an example test', function(done) {
-		expect(false).to.equal(true);
-		done();
+
+describe('Permissions', function() {
+
+	it('can construct a permission set', function() {
+		expect(function() {
+			return new PermissionSet([]);
+		}).to.not.throw(Error);
 	});
 
 });
-
-
