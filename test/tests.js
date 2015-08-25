@@ -4,12 +4,11 @@ let objtools = require('zs-objtools');
 let XError = require('xerror');
 
 
+function testGrantValue(grant, expectedValue) {
+	expect(grant.asObject()).to.deep.equal(expectedValue);
+}
 
 describe('Permissions', function() {
-
-	function testGrantValue(grant, expectedValue) {
-		expect(grant.asObject()).to.deep.equal(expectedValue);
-	}
 
 	let bigPermissions = [ {
 		target: 'pet',
@@ -290,4 +289,22 @@ describe('Permissions', function() {
 		}).to.throw(XError);
 	});
 
+});
+
+describe('Legacy permission conversion', function() {
+
+	it('fromLegacyPermissions()', function() {
+		let legacyPermissions = [ {
+			type: 'target',
+			targetType: 'User',
+			target: {
+				ns: 'brand_zcafe'
+			},
+			grant: true
+		} ];
+		let permissionSet = PermissionSet.fromLegacyPermissions(legacyPermissions);
+		testGrantValue(permissionSet.getTargetGrant('User', { ns: 'brand_zcafe' }), true);
+		testGrantValue(permissionSet.getTargetGrant('Snoozer', { ns: 'brand_zcafe' }), false);
+		testGrantValue(permissionSet.getTargetGrant('User', { ns: 'brand_bbbb' }), false);
+	});
 });
