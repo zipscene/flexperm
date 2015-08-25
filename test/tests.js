@@ -308,3 +308,158 @@ describe('Legacy permission conversion', function() {
 		testGrantValue(permissionSet.getTargetGrant('User', { ns: 'brand_bbbb' }), false);
 	});
 });
+
+describe('Grant', function() {
+
+	function createGrant(grantObj) {
+		return new PermissionSet.Grant(grantObj, 'LiterallyWhoCares', { personWhoCares: null });
+	}
+
+	it('accessors: asObject(), getTarget(), getMatch()', function() {
+		let grantObj = { read: true };
+		let grant = createGrant(grantObj);
+		expect(grant.asObject()).to.deep.equal(grantObj);
+		expect(grant.getTarget()).to.equal('LiterallyWhoCares');
+		expect(grant.getMatch()).to.deep.equal({ personWhoCares: null });
+	});
+
+	it('combineGrants()', function() {
+		let grant1 = {
+			read: true,
+			readMask: {
+				thing: true,
+				thang: {
+					_: true,
+					subThang: false
+				},
+				thung: {
+					subThung: true
+				}
+			}
+		};
+		let grant2 = {
+			read: true,
+			query: true,
+			readMask: {
+				thang: true,
+				thung: {
+					subberThung: true
+				}
+			}
+		};
+		let combined = PermissionSet.Grant.combineGrants(grant1, grant2);
+		expect(combined).to.deep.equal({
+			read: true,
+			query: true,
+			readMask: {
+				thang: true,
+				thing: true,
+				thung: {
+					subThung: true,
+					subberThung: true
+				}
+			}
+		});
+	});
+
+	it('createSubgrantFromMask()', function() {
+		let grant = createGrant({
+			do: true,
+			dont: {
+				doThis: true
+			}
+		});
+		expect(grant.createSubgrantFromMask('dont').asObject()).to.deep.equal({ doThis: true });
+	});
+
+	it('has(), check()', function() {
+
+		function checkBoth(shouldSucceed, grant, hasArg) {
+			if (shouldSucceed) {
+				expect(grant.has(hasArg)).to.equal(true);
+				expect(grant.check(hasArg)).to.equal(true);
+			} else {
+				expect(grant.has(hasArg)).to.equal(false);
+				expect(function() {
+					grant.check(hasArg);
+				}).to.throw(XError);
+			}
+		}
+
+		let grant1 = createGrant({
+			this: true,
+			andThis: true,
+			whatAboutThese: {
+				_: true,
+				butNotThis: false
+			}
+		});
+		checkBoth(true, grant1, 'andThis');
+		checkBoth(false, grant1, 'howAboutThis');
+		checkBoth(true, grant1, 'whatAboutThese.yeahThisToo');
+		checkBoth(false, grant1, 'whatAboutThese.butNotThis');
+
+		let grant2 = createGrant(true);
+		checkBoth(true, grant2, 'evenThis');
+		checkBoth(true, grant2, 'this.and.this.and.literally.everything');
+
+		let grant3 = createGrant(false);
+		checkBoth(false, grant3, 'awcmonjustalittle');
+	});
+
+	it('checkMask()', function() {
+		let grant = createGrant({
+			update: true,
+			updateMask: {
+				always: true,
+				stillAlways: true,
+				sometimes: {
+					_: true,
+					justNotNow: false
+				}
+			}
+		});
+		let obj = {
+			always: 'hi',
+			stillAlways: 'bye',
+			sometimes: {
+				stillThinkWereGood: 'cry'
+			}
+		};
+		expect(grant.checkMask('updateMask', obj)).to.equal(true);
+		obj.sometimes.justNotNow = 'try';
+		expect(function() {
+			grant.checkMask('updateMask', obj);
+		}).to.throw(XError);
+	});
+
+	it('checkNumber()', function() {
+		let grant = createGrant({
+			notNumber: true,
+			number: {
+				grantNumber: true,
+				min: 0,
+				max: 10
+			},
+			moreNumber: {
+				grantNumber: true,
+				min: 0,
+				max: true
+			}
+		});
+		expect(function() {
+			grant.checkNumber('hopefullyNumber', 5);
+		}).to.throw(XError);
+		expect(grant.checkNumber('notNumber', 50000)).to.equal(true);
+		expect(grant.checkNumber('number', 8)).to.equal(true);
+		expect(function() {
+			grant.checkNumber('number', -2);
+		}).to.throw(XError);
+		expect(function() {
+			grant.checkNumber('number', 13);
+		}).to.throw(XError);
+		expect(grant.checkNumber('moreNumber', 0)).to.equal(true);
+		expect(grant.checkNumber('moreNumber', 15)).to.equal(true);
+	});
+
+});
