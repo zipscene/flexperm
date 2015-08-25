@@ -57,7 +57,7 @@ objects, and to which parts of them. An example permission of this sort:
 
 ```javascript
 {
-	type: 'User',
+	target: 'User',
 	match: {
 		ns: 'brand_zcafe'
 	},
@@ -141,4 +141,17 @@ var permSet = new PermissionSet([ {
 var grant = permSet.getTargetGrant('file', { filename: 'thing.txt' });
 grant.checkNumber('fileSize', 50);  // Returns true
 grant.checkNumber('fileSize', 5000);  // Throws XError
+```
+
+### Admin permissions
+
+A target can have the special value '*', which will match every target checked against it. Thus, an admin permission,
+one that will be authorized to do anything, looks like this:
+
+```javascript
+{
+	target: '*',
+	match: {},
+	grant: true
+}
 ```

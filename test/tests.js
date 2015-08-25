@@ -59,6 +59,23 @@ describe('Permissions', function() {
 		expect(new PermissionSet(permissions).asArray()).to.deep.equal(permissions);
 	});
 
+	it('permission vars', function() {
+		let permissions = [ {
+			target: 'Order',
+			match: {
+				userId: {
+					$var: 'userId'
+				}
+			},
+			grant: {
+				start: true
+			}
+		} ];
+		let permissionSet = new PermissionSet(permissions, { userId: 'asdfasdf' });
+		testGrantValue(permissionSet.getTargetGrant('Order', { userId: 'asdfasdf' }), { start: true });
+		testGrantValue(permissionSet.getTargetGrant('Order', { userId: 'aoeuaoeu' }), false);
+	});
+
 	it('simple getTargetGrant()', function() {
 		let pet1 = {
 			name: 'Tama',
