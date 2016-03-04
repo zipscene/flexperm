@@ -1,6 +1,6 @@
 {
   "name": "zs-permission",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Permissions checking and handling for zsapi",
   "main": "./dist/lib/index.js",
   "repository": {
