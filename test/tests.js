@@ -76,6 +76,30 @@ describe('Permissions', function() {
 		testGrantValue(permissionSet.getTargetGrant('Order', { userId: 'aoeuaoeu' }), false);
 	});
 
+	it('should return an array of permissions with sustituted vars', function() {
+		let permissions = [ {
+			target: 'Order',
+			match: {
+				userId: {
+					$var: 'userId'
+				},
+				brandId: {
+					$var: 'brandId'
+				}
+			},
+			grant: {
+				start: true
+			}
+		} ];
+		let permissionSet = new PermissionSet(permissions, { userId: 'asdfasdf', brandId: 'marcos' });
+		let permissionArr = permissionSet.asArray();
+		expect(permissionArr).to.have.length(1);
+		expect(permissionArr[0]).to.have.property('target', 'Order');
+		expect(permissionArr[0].grant).to.have.property('start', true);
+		expect(permissionArr[0].match).to.have.property('userId', 'asdfasdf');
+		expect(permissionArr[0].match).to.have.property('brandId', 'marcos');
+	});
+
 	it('simple getTargetGrant()', function() {
 		let pet1 = {
 			name: 'Tama',

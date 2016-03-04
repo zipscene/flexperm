@@ -18,7 +18,7 @@
     "babel-runtime": "5.8.20",
     "lodash": "^3.10.1",
     "xerror": "^1.0.0",
-    "zs-common-query": "^1.3.0",
+    "zs-common-query": "^1.9.2",
     "zs-objtools": "^1.2.0"
   },
   "devDependencies": {
