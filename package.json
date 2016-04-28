@@ -1,6 +1,6 @@
 {
   "name": "zs-permission",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Permissions checking and handling for zsapi",
   "main": "./dist/lib/index.js",
   "repository": {
@@ -15,25 +15,25 @@
     "prepublish": "npm run-script build && npm run-script docs"
   },
   "dependencies": {
-    "babel-runtime": "5.8.20",
-    "lodash": "^3.10.1",
-    "xerror": "^1.0.0",
-    "zs-common-query": "^1.9.2",
-    "zs-objtools": "^1.2.0"
+    "babel-runtime": "6.6.1",
+    "lodash": "^4.11.1",
+    "xerror": "^1.1.1",
+    "zs-common-query": "^1.9.5",
+    "zs-objtools": "^1.6.0"
   },
   "devDependencies": {
-    "broccoli": "^0.16.7",
-    "broccoli-babel-transpiler": "^5.4.3",
+    "broccoli": "^0.16.9",
+    "broccoli-babel-transpiler": "^5.5.0",
     "broccoli-cli": "^1.0.0",
-    "broccoli-merge-trees": "^0.2.3",
-    "broccoli-static-compiler": "^0.2.1",
+    "broccoli-merge-trees": "^1.1.1",
+    "broccoli-static-compiler": "^0.2.2",
     "broccoli-wrap": "0.0.2",
-    "chai": "^3.2.0",
-    "es6-promise": "^3.0.2",
-    "eslint": "^1.2.1",
-    "mocha": "^2.2.5",
-    "source-map-support": "^0.3.2",
-    "yuidocjs": "^0.9.0"
+    "chai": "^3.5.0",
+    "es6-promise": "^3.1.2",
+    "eslint": "^2.8.0",
+    "mocha": "^2.4.5",
+    "source-map-support": "^0.4.0",
+    "yuidocjs": "^0.10.1"
   },
   "publishConfig": {
     "registry": "https://npm.zipscene.com/"
