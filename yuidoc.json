@@ -1,5 +1,5 @@
 {
-	"name": "zs-permission",
+	"name": "flexperm",
 	"description": "Permissions checking and handling for zsapi",
 	"options": {
 		"outdir": "./docs",

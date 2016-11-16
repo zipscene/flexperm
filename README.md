@@ -1,4 +1,4 @@
-# zs-permission
+# flexperm
 
 Permissions provide information about the actions a user is allowed to perform against an API. This module
 wraps a permissionArray - which contains the permission data - and provides methods to extract information
@@ -22,7 +22,7 @@ allows him to. When multiple permissions can match an object, their grants are O
 ## Usage
 
 ```javascript
-var PermissionSet = require('zs-permission');
+var PermissionSet = require('flexperm');
 
 var permArray = [ {
 	target: 'ordering',

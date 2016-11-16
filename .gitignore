@@ -1,13 +1,21 @@
-node_modules
-.DS_Store
-tmp
-docs
-npm-debug.log
+# general
 bower_components
 dist
-Node_Framework.sublime-project
-Node_Framework.sublime-workspace
-project.sublime-project
-project.sublime-workspace
+docs
+node_modules
+tmp
+
+# environment
+.configurez.*
+
+# logs
+npm-debug.log
+
+# debug
 /test*.js
+
+# platform
+*.sublime-project
+*.sublime-workspace
 *.swp
+.DS_Store

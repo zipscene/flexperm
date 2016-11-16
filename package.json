@@ -1,12 +1,17 @@
 {
-  "name": "zs-permission",
+  "name": "flexperm",
   "version": "1.0.3",
-  "description": "Permissions checking and handling for zsapi",
+  "description": "Flexible, granular, and fast permissions",
   "main": "./dist/lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git@git.zipscene.com:zsapilibs/zs-permission.git"
+    "url": "https://github.com/zipscene/flexperm.git"
   },
+  "keywords": [
+    "permissions",
+    "access",
+    "acl"
+  ],
   "scripts": {
     "lint": "node ./node_modules/.bin/eslint . || exit 0",
     "docs": "node ./node_modules/.bin/yuidoc .",
@@ -18,24 +23,23 @@
     "babel-runtime": "6.6.1",
     "lodash": "^4.11.1",
     "xerror": "^1.1.1",
-    "zs-common-query": "^1.9.5",
-    "zs-objtools": "^1.6.0"
+    "common-query": "^1.9.5",
+    "objtools": "^1.6.0"
   },
   "devDependencies": {
     "broccoli": "^0.16.9",
-    "broccoli-babel-transpiler": "^5.5.0",
+    "broccoli-babel-transpiler": "^5.6.1",
     "broccoli-cli": "^1.0.0",
-    "broccoli-merge-trees": "^1.1.1",
+    "broccoli-merge-trees": "^1.1.4",
     "broccoli-static-compiler": "^0.2.2",
     "broccoli-wrap": "0.0.2",
     "chai": "^3.5.0",
     "es6-promise": "^3.1.2",
     "eslint": "^2.8.0",
+    "eslint-config-zipscene": "^0.1.11",
     "mocha": "^2.4.5",
     "source-map-support": "^0.4.0",
     "yuidocjs": "^0.10.1"
   },
-  "publishConfig": {
-    "registry": "https://npm.zipscene.com/"
-  }
+  "license": "Apache-2.0"
 }

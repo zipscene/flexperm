@@ -1,12 +1,12 @@
 {
-  "name": "zs-permission",
+  "name": "flexperm",
   "version": "0.0.22",
   "private": true,
   "description": "Permissions checking and handling for zsapi.",
-  "main": "./dist/zs-permission.js",
+  "main": "./dist/flexperm.js",
   "repository": {
     "type": "git",
-    "url": "git@git.zipscene.com:zsapilibs/zs-permission.git"
+    "url": "git@git.zipscene.com:zsapilibs/flexperm.git"
   },
   "dependencies": {
     "blueimp-md5": "~1.1.0",
