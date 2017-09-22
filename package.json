@@ -1,6 +1,6 @@
 {
   "name": "flexperm",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Flexible, granular, and fast permissions",
   "main": "./dist/lib/index.js",
   "repository": {
