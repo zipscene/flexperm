@@ -321,9 +321,6 @@ describe('Permissions', function() {
 			limit: 50
 		}, 'doSomething')).to.equal(true);
 		expect(function() {
-			permissionSet.checkExecuteQuery('User', query, { fields: [ 'name', 'gender' ] });
-		}).to.throw(XError);
-		expect(function() {
 			permissionSet.checkExecuteQuery('User', query, { sort: [ 'birthday' ] });
 		}).to.throw(XError);
 		expect(function() {
