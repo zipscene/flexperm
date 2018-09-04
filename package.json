@@ -1,6 +1,6 @@
 {
   "name": "flexperm",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Flexible, granular, and fast permissions",
   "main": "./lib/index.js",
   "repository": {
@@ -19,15 +19,14 @@
     "prepublishOnly": "npm run-script docs"
   },
   "dependencies": {
-    "common-query": "^2.0.0",
+    "common-query": "^2.0.1",
     "lodash": "^4.17.10",
     "objtools": "^2.0.0",
     "xerror": "^1.1.2"
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "eslint": "^5.4.0",
-    "eslint-config-zipscene": "^0.2.3",
+    "eslint": "^5.5.0",
     "mocha": "^5.2.0",
     "yuidocjs": "^0.10.2"
   },
