@@ -182,6 +182,34 @@ describe('Permissions', function() {
 		});
 	});
 
+	it('getTargetGrant() combines non-exact match permissions correctly', function() {
+		let permissions = [ {
+			target: 'pet',
+			match: {
+				$or: [
+					{ animalType: 'dog' },
+					{ animalType: 'cat' }
+				]
+			},
+			grant: {
+				play: true
+			}
+		}, {
+			target: 'pet',
+			match: {},
+			grant: {
+				feed: true
+			}
+		} ];
+		let permissionSet = new PermissionSet(permissions);
+		testGrantValue(permissionSet.getTargetGrant('pet', {}), { feed: true });
+		testGrantValue(permissionSet.getTargetGrant('pet', { animalType: 'horse' }), { feed: true });
+		testGrantValue(permissionSet.getTargetGrant('pet', { animalType: 'cat' }), {
+			feed: true,
+			play: true
+		});
+	});
+
 	it('getTargetGrant() on admin permission', function() {
 		let weirdObject = {
 			daiofj: 'adoifam',
