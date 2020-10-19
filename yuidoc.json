@@ -1,8 +1,0 @@
-{
-	"name": "flexperm",
-	"description": "Permissions checking and handling for zsapi",
-	"options": {
-		"outdir": "./docs",
-		"exclude": "dist,tmp,test,node_modules"
-	}
-}
